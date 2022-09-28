@@ -77,19 +77,22 @@ class MessageDispatcher(object):
         if subtype == u'message_changed':
             return
 
-        botname = self._get_bot_name()
-        try:
-            msguser = self._client.users.get(msg['user'])
-            username = msguser['name']
-        except (KeyError, TypeError):
-            if 'username' in msg:
-                username = msg['username']
-            elif 'bot_profile' in msg and 'name' in msg['bot_profile']:
-                username = msg['bot_profile']['name']
-            else:
-                return
+        # botname = self._get_bot_name()
+        # try:
+        #     msguser = self._client.users.get(msg['user'])
+        #     username = msguser['name']
+        # except (KeyError, TypeError):
+        #     if 'username' in msg:
+        #         username = msg['username']
+        #     elif 'bot_profile' in msg and 'name' in msg['bot_profile']:
+        #         username = msg['bot_profile']['name']
+        #     else:
+        #         return
+        #
+        # if username == botname or username == u'slackbot':
+        #     return
 
-        if username == botname or username == u'slackbot':
+        if not self._is_from_human(msg):
             return
 
         msg_respond_to = self.filter_text(msg)
@@ -97,6 +100,9 @@ class MessageDispatcher(object):
             self._pool.add_task(('respond_to', msg_respond_to))
         else:
             self._pool.add_task(('listen_to', msg))
+
+    def _is_from_human(self, msg: dict) -> bool:
+        return bool(msg.get('user_team'))
 
     def _get_bot_id(self):
         return self._client.login_data['self']['id']
