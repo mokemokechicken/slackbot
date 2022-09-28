@@ -61,7 +61,7 @@ class SlackClient(object):
         self.login_data = login_data
         self.domain = self.login_data['team']['domain']
         self.username = self.login_data['self']['name']
-        # self.parse_user_data(login_data['users'])
+        self.parse_user_data(self.webapi.users.list().body['members'])
         # self.parse_channel_data(login_data['channels'])
         # self.parse_channel_data(login_data['groups'])
         # self.parse_channel_data(login_data['ims'])
